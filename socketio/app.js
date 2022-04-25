@@ -1,6 +1,10 @@
-const app = require("express")();
+const express = require("express");
+const app = express();
 const server = require("http").createServer(app);
 const io = require("socket.io")(server);
+// const path = require('path');
+// app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static("public"));
 
 server.listen((port = 80), function () {
   console.log("port:", port);
@@ -29,20 +33,21 @@ io.on("connection", function (ioSocket) {
 
 */
   ioSocket.on("leaveRoom", (roomNum, nickname) => {
-    io.to(roomNum).emit("msgToRoom", `<System> ${nickname} has left the room`);
+    io.to(roomNum).emit("msgToRoom_leaveRoom", nickname);
     ioSocket.leave(roomNum);
   });
 
   ioSocket.on("joinRoom", (roomNum, nickname) => {
     ioSocket.join(roomNum);
-    io.to(roomNum).emit(
-      "msgToRoom",
-      `<System> ${nickname} has joined the room`
-    );
+    io.to(roomNum).emit("msgToRoom_joinRoom", nickname);
   });
 
   ioSocket.on("msgToServer", (roomNum, nickname, msg) => {
-    console.log(roomNum, nickname, msg);
-    io.to(roomNum).emit("msgToRoom", nickname + ": " + msg);
+    console.log(roomNum, { nickname, msg });
+    io.to(roomNum).emit("msgToRoom", { nickname, msg });
   });
+
+
+  
+
 });

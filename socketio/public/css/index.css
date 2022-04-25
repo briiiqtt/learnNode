@@ -1,0 +1,27 @@
+@charset "utf-8";
+.inner-headerarea {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 10vh;
+}
+/* .recieved {
+    text-align: left;
+}
+.sent {
+    text-align: right;
+} */
+.inner-chatarea {
+  background-color: rgb(205, 221, 223);
+}
+#chats {
+  height: 80vh;
+  overflow: scroll;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.roomBtns {
+  display: flex;
+  flex-direction: column;
+}

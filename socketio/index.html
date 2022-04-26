@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>Socket</title>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <link rel="stylesheet" href="./css/index.css" type="text/css">
@@ -85,7 +86,12 @@
         this.setNickname = function (e) {
             let nickInput = document.getElementById('nickname');
             if (!nickInput.value) {
-                alert('input your name')
+                Swal.fire({
+                    title: 'Warning',
+                    text: 'Please input your name',
+                    icon: 'warning',
+                    confirmButtonText: 'Okay'
+                });
                 return false;
             }
             e.target.disabled = true;
@@ -101,8 +107,23 @@
         }
 
         this.createRoom = function () {
-            let roomName = prompt('input new room name');
-            socket.emit('createRoom', { roomName: roomName, nickname: this.nickname })
+            let roomName = null;
+            Swal.fire({
+                title: 'Submit new room\'s name',
+                input: 'text',
+                inputAttributes: {
+                    autocapitalize: 'off'
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Submit',
+                showLoaderOnConfirm: true,
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    roomName = result.value;
+                    socket.emit('createRoom', { roomName: roomName, nickname: this.nickname })
+                }
+            })
         }
     }
     const chatter = new Chatter();

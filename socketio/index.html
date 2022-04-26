@@ -19,12 +19,15 @@
         </div>
         <div class="row">
             <div class="col-4">
-                <input id="nickname"><button class="confirmNickname btn-success">confirm nickname</button>
-                <div id="hidedDiv" style="display: none;">
-                    <div class="roomBtns">
-                        <button class="roomBtn btn-secondary" data-num="1">room1</button>
-                        <button class="roomBtn btn-secondary" data-num="2">room2</button>
-                        <button class="roomBtn btn-secondary" data-num="3">room3</button>
+                <input id="nickname"><button class="confirmNickname btn btn-success">confirm nickname</button>
+                <div class="roomBtns">
+                    <button class="roombtn btn btn-secondary" data-num="1">default room</button>
+                    <div id="hidedDiv" style="display: none;">
+                        <div class="rooms" id="rooms">
+                        </div>
+                        <div class="center">
+                            <button class="createRoom btn btn-primary rounded-circle" data-num="+">+</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -34,7 +37,8 @@
                     <div class="input-group mb-3">
                         <input type="text" id="chat" class="form-control">
                         <div class="input-group-append">
-                            <button class="btn btn-outline-secondary btn-warning" type="button">Send</button>
+                            <button id="send" class="btn btn-outline-secondary btn-warning" type="button"
+                                disabled="true">Send</button>
                         </div>
                     </div>
                 </div>
@@ -46,9 +50,64 @@
 </body>
 
 <script>
+    function Chatter() {
+        this.curRoom = null;
+        this.nickname = null;
+
+        this.drawRooms = function (rooms) {
+            $('#rooms').empty();
+            for (room of rooms) {
+                let btn = $(`<button>${room.room_name}</button>`);
+                btn.addClass('roombtn btn btn-secondary').attr('data-num', room.room_idx);
+                $('#rooms').append(btn);
+            }
+        }
+
+        this.joinRoom = function (e) {
+
+            if (this.curRoom) {
+                this.leaveRoom();
+            }
+
+            let roomNum = e.target.getAttribute('data-num');
+            this.curRoom = roomNum;
+            document.getElementById('banner').innerHTML = `ROOM NAME: < ${e.target.innerHTML} >`;
+
+            socket.emit('joinRoom', this.curRoom, nickname.value);
+
+        }
+
+        this.leaveRoom = function () {
+            socket.emit('leaveRoom', this.curRoom, this.nickname);
+            this.curRoom = null;
+        }
+
+        this.setNickname = function (e) {
+            let nickInput = document.getElementById('nickname');
+            if (!nickInput.value) {
+                alert('input your name')
+                return false;
+            }
+            e.target.disabled = true;
+            nickInput.readOnly = true;
+            this.nickname = nickInput.value;
+            e.target.innerHTML = `your name: ${this.nickname}`;
+
+            socket.emit('getRoomList_solo', { socketId: socket.id, nickname: this.nickname })
+            //
+            document.getElementById('hidedDiv').style.display = 'block';
+            document.getElementById('send').disabled = false;
+
+        }
+
+        this.createRoom = function () {
+            let roomName = prompt('input new room name');
+            socket.emit('createRoom', { roomName: roomName, nickname: this.nickname })
+        }
+    }
+    const chatter = new Chatter();
     const socket = io();
     socket.on('msgToRoom', (d) => {
-        console.log(d);
         let directionDiv = document.createElement('div');
         let msgDiv = document.createElement('div');
 
@@ -67,71 +126,49 @@
         document.getElementById('chats').appendChild(directionDiv);
     })
 
+    socket.on('roomList', (rooms) => {
+        chatter.drawRooms(rooms);
+    });
     socket.on('msgToRoom_leaveRoom', (d) => {
         console.log(`${d} has left the room`);
     })
     socket.on('msgToRoom_joinRoom', (d) => {
         console.log(`${d} has joined the room`);
     })
-</script>
+    socket.on('roomCreated', function (obj) {
+        socket.emit('getRoomList', { socketId: socket.id, nickname: this.nickname })
+    })
 
 
-<script>
 
     let chat = document.getElementById('chat');
     chat.addEventListener('keydown', (e) => {
         if (e.keyCode !== 13) return false;
-        socket.emit('msgToServer', chatter.curRoom, chatter.nickname, chat.value);
-        chat.value = '';
+        document.getElementById('send').click();
     })
 
 
-    function Chatter() {
-        this.curRoom = null;
-        this.nickname = null;
 
-        this.joinRoom = function (e) {
 
-            if (this.curRoom) {
-                this.leaveRoom();
-            }
-
-            let roomNum = e.target.getAttribute('data-num');
-            this.curRoom = roomNum;
-            document.getElementById('banner').innerHTML = 'ROOM' + this.curRoom;
-
-            socket.emit('joinRoom', this.curRoom, nickname.value);
-
-        }
-
-        this.leaveRoom = function () {
-            socket.emit('leaveRoom', this.curRoom, this.nickname);
-            this.curRoom = null;
-        }
-
-        this.setNickname = function () {
-            let nickInput = document.getElementById('nickname');
-            if (!nickInput.value) {
-                alert('닉네임입력하세ㅛㅇ')
-                return false;
-            }
-            nickInput.readOnly = true;
-            this.nickname = nickInput.value;
-            document.getElementById('hidedDiv').style.display = 'block';
-        }
-    }
-
-    let chatter = new Chatter();
 
     document.addEventListener('click', (e) => {
         if (e.target.tagName !== 'BUTTON') return false;
 
-        if (e.target.className.includes('roomBtn')) {
+        if (e.target.className.includes('roombtn')) {
             chatter.joinRoom(e);
         }
 
         if (e.target.className.includes('confirmNickname')) {
-            chatter.setNickname();
+            chatter.setNickname(e);
+        }
+
+        if (e.target.className.includes('createRoom')) {
+            chatter.createRoom(e);
+        }
+
+        if (e.target.id === 'send') {
+            socket.emit('msgToServer', chatter.curRoom, chatter.nickname, chat.value);
+            chat.value = '';
         }
 
     })

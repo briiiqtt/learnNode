@@ -20,8 +20,19 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  font-size: x-large;
 }
-.roomBtns {
+.roomBtns,
+.rooms {
   display: flex;
   flex-direction: column;
+}
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 5px;
+}
+.btn {
+  margin: 1px;
 }

@@ -1,28 +1,29 @@
 @charset "utf-8";
-.inner-headerarea {
+.cf1 {
+  width: 100vw;
+  height: 100vh;
+}
+/* .headerarea {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  height: 10vh;
-}
-/* .recieved {
-    text-align: left;
-}
-.sent {
-    text-align: right;
 } */
-.inner-chatarea {
+#display-chat {
+  background-color: red;
+}
+.chatarea {
   background-color: rgb(205, 221, 223);
 }
-#chats {
-  height: 80vh;
-  overflow: scroll;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  font-size: x-large;
+#chats,
+#roomlist {
+  height: calc(100vh - 112px);
+  overflow-y: scroll;
 }
-.roomBtns,
+#chats {
+  display: flex;
+  flex-direction: column-reverse;
+}
+.roomdivs,
 .rooms {
   display: flex;
   flex-direction: column;
@@ -35,4 +36,35 @@
 }
 .btn {
   margin: 1px;
+}
+.msg {
+  padding: 4px;
+  font-size: x-large;
+}
+.msgdiv {
+  margin: 5px;
+}
+.margin10 {
+  margin: 10px;
+}
+.margin20 {
+  margin: 50px;
+}
+i {
+  cursor: pointer;
+}
+.cf2 {
+  background-color: rgb(250, 250, 250);
+  height: 111px;
+  font-size: xx-large;
+  /* display: flex;
+  justify-content: space-around;
+  align-items: center; */
+}
+.footbox {
+  height: 109px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
 }

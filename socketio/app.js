@@ -2,10 +2,12 @@ const express = require("express");
 const app = express();
 const server = require("http").createServer(app);
 const io = require("socket.io")(server);
+
 // const path = require('path');
 // app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static("public"));
-
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 //
 const db = require("./DB");
 //
@@ -14,10 +16,16 @@ server.listen((port = 80), function () {
   console.log("port:", port);
 });
 
+//URL Mapping
 app.get("/", function (req, res) {
   res.sendFile(`${__dirname}/index.html`);
 });
 
+app.get("/chatlist", (req, res) => {
+  db.getChatLog(req.query.roomNum).then((r) => {
+    res.send(r);
+  });
+});
 
 //Socket.IO
 io.on("connection", function (ioSocket) {
@@ -48,27 +56,27 @@ io.on("connection", function (ioSocket) {
 
   /*-----------------------------------*/
 
-  ioSocket.on("leaveRoom", (roomNum, nickname) => {
-    io.to(roomNum).emit("msgToRoom_leaveRoom", nickname);
+  ioSocket.on("leaveRoom", (roomNum, userName) => {
+    io.to(roomNum).emit("msgToRoom_leaveRoom", userName);
     ioSocket.leave(roomNum);
   });
 
-  ioSocket.on("joinRoom", (roomNum, nickname) => {
+  ioSocket.on("joinRoom", (roomNum, userName) => {
     ioSocket.join(roomNum);
-    io.to(roomNum).emit("msgToRoom_joinRoom", nickname);
+    io.to(roomNum).emit("msgToRoom_joinRoom", userName);
   });
 
   /*-----------------------------------*/
 
-  ioSocket.on("msgToServer", (roomNum, nickname, msg) => {
-    io.to(roomNum).emit("msgToRoom", { nickname, msg });
-    db.recordMessage(msg, nickname, roomNum);
+  ioSocket.on("msgToServer", (roomNum, userName, msg) => {
+    io.to(roomNum).emit("msgToRoom", { userName, msg });
+    db.recordMessage(msg, userName, roomNum);
   });
 
   /*-----------------------------------*/
 
   ioSocket.on("createRoom", function (obj) {
-    db.createRoom(obj.roomName, obj.nickname);
+    db.createRoom(obj.roomName, obj.userName);
     io.emit("roomCreated", obj);
   });
 });

@@ -31,28 +31,44 @@ module.exports.getRoomList = function () {
   return query("select*from rooms");
 };
 
-module.exports.createRoom = function (roomName, nickname) {
-  return query(`insert into rooms (
-                      room_idx,
-                      room_name,
-                      host
-                      )
-                    values (
-                      nextval('socketio_room_seq'),
-                      '${roomName}',
-                      '${nickname}'
-                    )`);
+module.exports.createRoom = function (roomName, userName) {
+  return query(`
+  insert into rooms (
+    room_idx,
+    room_name,
+    host
+  )
+  values (
+    nextval('socketio_room_seq'),
+    '${roomName}',
+    '${userName}'
+  )`);
 };
 
-module.exports.recordMessage = function (msg, nickname, roomNum) {
-  return query(`insert into messages (
-                      message,
-                      sender,
-                      room_idx
-                      )
-                    values (
-                      '${msg}',
-                      '${nickname}',
-                      '${roomNum}'
-                    )`);
+module.exports.recordMessage = function (msg, userName, roomNum) {
+  return query(`
+  insert into messages (
+    message,
+    sender,
+    room_idx
+    )
+  values (
+    '${msg}',
+    '${userName}',
+    '${roomNum}'
+  )`);
+};
+
+module.exports.getChatLog = function (roomNum) {
+  return query(`
+  select
+    message,
+    sender,
+    sent_datetime,
+    room_idx
+  from 
+    messages
+  where
+    room_idx = ${roomNum}
+  `);
 };

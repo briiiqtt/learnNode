@@ -22,6 +22,7 @@
   height: calc(100vh - 72px - 40px);
   overflow-y: scroll;
 }
+.ggupdegi,
 #roomlist {
   height: calc(100vh - 112px - 10vh);
   overflow-y: scroll;
@@ -34,12 +35,6 @@
 .rooms {
   display: flex;
   flex-direction: column;
-}
-.center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 5px;
 }
 .btn {
   margin: 1px;
@@ -95,12 +90,15 @@ i {
 .msgdiv span {
   margin: 5px;
 }
-.li-roomname{
+.li-roomname {
   font-size: 1.5em;
 }
-.li-lastmsg{
+.li-lastmsg {
   font-size: 1.2em;
 }
-.li-datetime{
+.li-datetime {
   font: 1em;
+}
+.footbox i{
+  font-size: 7vw;
 }

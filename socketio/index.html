@@ -15,10 +15,10 @@
 <body>
     <div class="container-fluid cf1">
         <div id="display-header" class="dp header">
-            <div id="headertitle">친구</div>
+            <div id="headertitle">ㅎㅇ</div>
             <div>
                 <i class="margin10 bi bi-search"></i>
-                <i class="margin10 bi bi-plus-square"></i>
+                <i class="createroom margin10 bi bi-plus-square"></i>
                 <i class="margin10 bi bi-gear"></i>
             </div>
         </div>
@@ -26,14 +26,14 @@
             <input id="userName" placeholder="이름">
             <div class="confirmusername btn btn-success">제출</div>
         </div>
-        <div id="display-list" style="display: none;" class="dp">
+        <div id="display-userlist" style="display: none;" class="dp">
+            <div class="ggupdegi"></div>
+        </div>
+        <div id="display-roomlist" style="display: none;" class="dp">
             <div id="roomlist">
                 <ul id="roomsul" class="list-group list-group">
                 </ul>
                 <div class="rooms" id="rooms">
-                </div>
-                <div class="center">
-                    <div class="createRoom btn btn-primary rounded-circle" data-num="+">+</div>
                 </div>
             </div>
         </div>
@@ -54,6 +54,9 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div id="display-settings" style="display: none;" class="dp">
+            <div class="ggupdegi"></div>
         </div>
         <div id="display-footer" style="display: block;" class="container-fluid cf2 dp">
             <div class="row">
@@ -114,8 +117,6 @@
             socket.emit('joinRoom', this.curRoom, userName.value);
 
             this.getChatLog(roomNum);
-
-            this.toggleDisplay('display-chat', 'display-list')
         }
 
         this.getChatLog = function (roomNum) {
@@ -195,7 +196,7 @@
 
             socket.emit('getRoomList_solo', { socketId: socket.id, userName: this.userName })
             //
-            this.toggleDisplay('display-list', 'display-login')
+            this.toggleDisplay('display-roomlist')
             document.getElementById('send').disabled = false;
 
         }
@@ -230,11 +231,41 @@
             })
         }
 
-        this.toggleDisplay = function (toggleOn, toggleOff) {
-            if (toggleOn)
-                document.getElementById(toggleOn).style.display = 'block';
-            if (toggleOff)
-                document.getElementById(toggleOff).style.display = 'none';
+        this.toggleDisplay = function (cmd) {
+            let displays = document.getElementsByClassName('dp');
+            let hdTitle = document.getElementById('headertitle');
+            for (let dp of displays) {
+                dp.style.display = 'none';
+            }
+            document.getElementById(cmd).style.display = 'block';
+
+            switch (cmd) {
+                case 'display-userlist':
+                    hdTitle.innerHTML = '친구';
+                    break;
+                case 'display-roomlist':
+                    hdTitle.innerHTML = '채팅';
+                    break;
+                case 'display-settings':
+                    hdTitle.innerHTML = '더보기';
+                    break;
+            }
+
+            if (cmd === 'display-chat') {
+                this.toggleHeaderAndFooter(false);
+            } else {
+                this.toggleHeaderAndFooter(true);
+            }
+        }
+
+        this.toggleHeaderAndFooter = function (bool) {
+            if (bool) {
+                document.getElementById('display-header').style.display = 'flex';
+                document.getElementById('display-footer').style.display = 'block';
+            } else {
+                document.getElementById('display-header').style.display = 'none';
+                document.getElementById('display-footer').style.display = 'none';
+            }
         }
     }
     const chatter = new Chatter();
@@ -286,16 +317,11 @@
             // if (e.target.className.includes('roomli')) {
             if (e.target.closest('.roomli')) {
                 chatter.joinRoom(e);
-                chatter.toggleDisplay(null, 'display-footer');
-                chatter.toggleDisplay(null, 'display-header');
+                chatter.toggleDisplay('display-chat')
             }
 
             if (e.target.className.includes('confirmusername')) {
                 chatter.setUserName(e);
-            }
-
-            if (e.target.className.includes('createRoom')) {
-                chatter.createRoom(e);
             }
 
             if (e.target.id === 'send') {
@@ -306,14 +332,16 @@
         }
         if (e.target.tagName === 'I') {
             if (e.target.id === 'backarrow') {
-                chatter.toggleDisplay('display-list', 'display-chat')
-                document.getElementById('display-header').style.display = 'flex';
-                chatter.toggleDisplay('display-footer', null);
+                chatter.toggleDisplay('display-roomlist')
+                chatter.toggleHeaderAndFooter(true);
+            }
+
+            if (e.target.className.includes('createroom')) {
+                chatter.createRoom(e);
             }
         }
 
         if (e.target.className.includes('menu-')) {
-            let displays = document.getElementsByClassName('dp');
             let user = document.getElementById('i-userlist')
             let chat = document.getElementById('i-chatlist')
             let sett = document.getElementById('i-settings')
@@ -326,6 +354,8 @@
 
                 user.classList.remove('bi-people')
                 user.classList.add('bi-people-fill')
+
+                chatter.toggleDisplay('display-userlist')
             }
             if (e.target.className.includes('menu-chatlist')) {
                 user.classList.remove('bi-people-fill')
@@ -335,6 +365,9 @@
 
                 chat.classList.remove('bi-chat-dots')
                 chat.classList.add('bi-chat-dots-fill')
+
+                chatter.toggleDisplay('display-roomlist')
+
             }
             if (e.target.className.includes('menu-settings')) {
                 user.classList.remove('bi-people-fill')
@@ -344,6 +377,9 @@
 
                 sett.classList.remove('bi-three-dots')
                 sett.classList.add('bi-three-dots-vertical')
+
+                chatter.toggleDisplay('display-settings')
+
             }
         }
     })

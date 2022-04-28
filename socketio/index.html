@@ -14,13 +14,22 @@
 
 <body>
     <div class="container-fluid cf1">
-        <div id="display-login" style="display: block;">
+        <div id="display-header" class="dp header">
+            <div id="headertitle">친구</div>
+            <div>
+                <i class="margin10 bi bi-search"></i>
+                <i class="margin10 bi bi-plus-square"></i>
+                <i class="margin10 bi bi-gear"></i>
+            </div>
+        </div>
+        <div id="display-login" style="display: block;" class="dp">
             <input id="userName" placeholder="이름">
             <div class="confirmusername btn btn-success">제출</div>
         </div>
-        <div id="display-list" style="display: none;">
-            <div class="roomdivs" id="roomlist">
-                <div class="roombtn btn btn-secondary" data-num="1">default room</div>
+        <div id="display-list" style="display: none;" class="dp">
+            <div id="roomlist">
+                <ul id="roomsul" class="list-group list-group">
+                </ul>
                 <div class="rooms" id="rooms">
                 </div>
                 <div class="center">
@@ -28,7 +37,7 @@
                 </div>
             </div>
         </div>
-        <div id="display-chat" style="display: none;">
+        <div id="display-chat" style="display: none;" class="dp">
             <div class="chatarea">
                 <div class="navbar">
                     <i id="backarrow" class="bi bi-box-arrow-left h1 margin10"></i>
@@ -39,13 +48,14 @@
                 <div class="input-group mb-3 footer">
                     <input type="text" id="chat" class="form-control">
                     <div class="input-group-append">
-                        <div id="send" class="btn btn-outline-secondary btn-warning" type="button" disabled="true">Send
+                        <div id="send" class="btn btn-outline-secondary btn-warning" type="button" disabled="true">
+                            <i class="bi bi-arrow-up-circle h2"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div id="display-footer" style="display: block;" class="container-fluid cf2">
+        <div id="display-footer" style="display: block;" class="container-fluid cf2 dp">
             <div class="row">
                 <div class="footbox col menu-userlist">
                     <i class="bi bi-people menu-userlist" id="i-userlist"></i>
@@ -64,16 +74,30 @@
 </body>
 
 <script>
+    let lastSender = null;
     function Chatter() {
         this.curRoom = null;
         this.userName = null;
 
         this.drawRooms = function (rooms) {
-            $('#rooms').empty();
+            $('#roomsul').empty();
             for (room of rooms) {
-                let btn = $(`<div>${room.room_name}</div>`);
-                btn.addClass('roombtn btn btn-secondary').attr('data-num', room.room_idx);
-                $('#rooms').append(btn);
+                $('#roomsul').append(
+                    `<li class="roomli list-group-item" data-num="${room.room_idx}" data-roomname="${room.room_name}">
+                        <div class="row">
+                            <div class="col-2 li-left">
+                                <img src="./public/img/dummy.png" class="img-fluid rounded-circle peusa">
+                            </div>
+                            <div class="col-8" li-mid>
+                                <div class="li-roomname">${room.room_name}</div>
+                                <div class="li-lastmsg">last_msg</div>
+                            </div>
+                            <div class="col-2 li-right">
+                                <div class="li-datetime">hh24:mi</div>
+                                <span class="li-badge badge bg-primary rounded-pill">11</span>
+                            </div>
+                        </div>
+                    </li>`);
             }
         }
 
@@ -83,9 +107,9 @@
                 this.leaveRoom();
             }
 
-            let roomNum = e.target.getAttribute('data-num');
+            let roomNum = e.target.closest('.roomli').getAttribute('data-num');
             this.curRoom = roomNum;
-            document.getElementById('roomtitle').innerHTML = e.target.innerHTML;
+            document.getElementById('roomtitle').innerHTML = e.target.closest('.roomli').getAttribute('data-roomname');
 
             socket.emit('joinRoom', this.curRoom, userName.value);
 
@@ -103,29 +127,49 @@
         this.drawChat = function (r) {
             $('#chats').empty();
             for (let msg of r) {
-                this.drawMessage(msg.message, msg.sender);
+                this.drawMessage(msg.message, msg.sender, msg.sent_datetime);
             }
         }
 
-        this.drawMessage = function (msg, userName) {
+        this.drawMessage = function (msg, userName, dateTime) {
+            let myMsg = `
+                <div class="msgdiv" style="text-align: right;">
+                    <span>${dateTime}</span>
+                    <span class="alert-warning rounded msg">${msg}</span>
+                </div>`;
 
-            let directionDiv = document.createElement('div');
-            let msgSpan = document.createElement('span');
+            let othersInitialMsg = `
+                    <div class="msgdiv" style="text-align: left;">
+                        <div>${userName}</div>
+                        <div>
+                            <img src="./public/img/dummy.png" class="img-fluid rounded-circle chat-peusa"></div>
+                        &emsp;&emsp;&emsp;<span class="alert-light rounded msg">${msg}</span>
+                        <span>${dateTime}</span>
+                    </div>`;
+
+            let othersContinuousMsg = `
+                    <div class="msgdiv" style="text-align: left;">
+                        <div>
+                        &emsp;&emsp;&emsp;<span class="alert-light rounded msg">${msg}</span>
+                        <span>${dateTime}</span>
+                    </div>`;
+
 
             if (userName === chatter.userName) {
-                msgSpan.classList.add('alert-warning', 'rounded')
-                directionDiv.style.textAlign = 'right';
-                msgSpan.innerText = msg;
+                $('#chats').prepend(myMsg);
             } else {
-                msgSpan.classList.add('alert-light', 'rounded')
-                directionDiv.style.textAlign = 'left';
-                directionDiv.innerHTML = userName + '<br>';
-                msgSpan.innerText = msg;
+                if (!document.getElementById('chats').childNodes[1]) {
+                    $('#chats').prepend(othersInitialMsg);
+                } else {
+                    if (lastSender === userName) {
+                        $('#chats').prepend(othersContinuousMsg);
+                    } else {
+                        $('#chats').prepend(othersInitialMsg);
+                    }
+                }
+
             }
-            msgSpan.classList.add('msg');
-            directionDiv.classList.add('msgdiv');
-            directionDiv.appendChild(msgSpan);
-            document.getElementById('chats').prepend(directionDiv);
+            lastSender = userName;
         }
 
         this.leaveRoom = function () {
@@ -134,8 +178,8 @@
         }
 
         this.setUserName = function (e) {
-            let nickInput = document.getElementById('userName');
-            if (!nickInput.value) {
+            let nameInput = document.getElementById('userName');
+            if (!nameInput.value) {
                 Swal.fire({
                     title: '알림',
                     text: '유효하지않음!',
@@ -145,8 +189,8 @@
                 return false;
             }
             e.target.disabled = true;
-            nickInput.readOnly = true;
-            this.userName = nickInput.value;
+            nameInput.readOnly = true;
+            this.userName = nameInput.value;
             e.target.innerHTML = `your userName: ${this.userName}`;
 
             socket.emit('getRoomList_solo', { socketId: socket.id, userName: this.userName })
@@ -196,7 +240,7 @@
     const chatter = new Chatter();
     const socket = io();
     socket.on('msgToRoom', (d) => {
-        chatter.drawMessage(d.msg, d.userName);
+        chatter.drawMessage(d.msg, d.userName, d.dateTime);
     })
 
     socket.on('roomList', (rooms) => {
@@ -220,14 +264,30 @@
         document.getElementById('send').click();
     })
 
+    const getDateTimeString = function () {
+        let dt = new Date();
+        function treatUnderTen(a) {
+            return a < 10 ? '0' + a : a;
+        }
+        let year = dt.getYear() + 1900;
+        let month = treatUnderTen(dt.getMonth() + 1)
+        let date = treatUnderTen(dt.getDate());
+        let hour = treatUnderTen(dt.getHours());
+        let min = treatUnderTen(dt.getMinutes());
+        let sec = treatUnderTen(dt.getSeconds());
+        return `${year}-${month}-${date} ${hour}:${min}:${sec}`;
+    }
 
 
     document.addEventListener('click', (e) => {
         if (e.target.tagName === 'DIV') {
 
 
-            if (e.target.className.includes('roombtn')) {
+            // if (e.target.className.includes('roomli')) {
+            if (e.target.closest('.roomli')) {
                 chatter.joinRoom(e);
+                chatter.toggleDisplay(null, 'display-footer');
+                chatter.toggleDisplay(null, 'display-header');
             }
 
             if (e.target.className.includes('confirmusername')) {
@@ -239,18 +299,21 @@
             }
 
             if (e.target.id === 'send') {
-                socket.emit('msgToServer', chatter.curRoom, chatter.userName, chat.value);
+                if (!chat.value) return false;
+                socket.emit('msgToServer', chatter.curRoom, chatter.userName, chat.value, getDateTimeString());
                 chat.value = '';
             }
         }
         if (e.target.tagName === 'I') {
-            console.log('asdf')
             if (e.target.id === 'backarrow') {
                 chatter.toggleDisplay('display-list', 'display-chat')
+                document.getElementById('display-header').style.display = 'flex';
+                chatter.toggleDisplay('display-footer', null);
             }
         }
 
         if (e.target.className.includes('menu-')) {
+            let displays = document.getElementsByClassName('dp');
             let user = document.getElementById('i-userlist')
             let chat = document.getElementById('i-chatlist')
             let sett = document.getElementById('i-settings')
@@ -282,7 +345,6 @@
                 sett.classList.remove('bi-three-dots')
                 sett.classList.add('bi-three-dots-vertical')
             }
-
         }
     })
 

@@ -45,16 +45,18 @@ module.exports.createRoom = function (roomName, userName) {
   )`);
 };
 
-module.exports.recordMessage = function (msg, userName, roomNum) {
+module.exports.recordMessage = function (msg, userName, roomNum, dateTime) {
   return query(`
   insert into messages (
     message,
     sender,
+    sent_datetime,
     room_idx
     )
   values (
     '${msg}',
     '${userName}',
+    '${dateTime}',
     '${roomNum}'
   )`);
 };
@@ -64,7 +66,7 @@ module.exports.getChatLog = function (roomNum) {
   select
     message,
     sender,
-    sent_datetime,
+    date_format(sent_datetime, '%Y-%m-%d %H:%i:%s') "sent_datetime",
     room_idx
   from 
     messages

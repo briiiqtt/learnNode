@@ -1,4 +1,8 @@
 @charset "utf-8";
+@import url("https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap");
+* {
+  font-family: "Nanum Gothic", sans-serif;
+}
 .cf1 {
   width: 100vw;
   height: 100vh;
@@ -14,16 +18,19 @@
 .chatarea {
   background-color: rgb(205, 221, 223);
 }
-#chats,
+#chats {
+  height: calc(100vh - 72px - 40px);
+  overflow-y: scroll;
+}
 #roomlist {
-  height: calc(100vh - 112px);
+  height: calc(100vh - 112px - 10vh);
   overflow-y: scroll;
 }
 #chats {
   display: flex;
   flex-direction: column-reverse;
 }
-.roomdivs,
+/* .roomdivs, */
 .rooms {
   display: flex;
   flex-direction: column;
@@ -38,7 +45,7 @@
   margin: 1px;
 }
 .msg {
-  padding: 4px;
+  padding: 6px;
   font-size: x-large;
 }
 .msgdiv {
@@ -55,16 +62,45 @@ i {
 }
 .cf2 {
   background-color: rgb(250, 250, 250);
-  height: 111px;
+  height: 10vh;
   font-size: xx-large;
   /* display: flex;
   justify-content: space-around;
   align-items: center; */
 }
 .footbox {
-  height: 109px;
+  height: 10vh;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
+}
+.header {
+  height: 100px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: xx-large;
+}
+.peusa {
+  width: 25vw;
+  height: 25vh;
+  border: 1px solid gray;
+}
+.chat-peusa {
+  width: 6vw;
+  height: 6vh;
+  border: 1px solid gray;
+}
+.msgdiv span {
+  margin: 5px;
+}
+.li-roomname{
+  font-size: 1.5em;
+}
+.li-lastmsg{
+  font-size: 1.2em;
+}
+.li-datetime{
+  font: 1em;
 }

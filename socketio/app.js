@@ -6,6 +6,7 @@ const io = require("socket.io")(server);
 // const path = require('path');
 // app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static("public"));
+app.use("/public", express.static("public"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 //
@@ -23,6 +24,7 @@ app.get("/", function (req, res) {
 
 app.get("/chatlist", (req, res) => {
   db.getChatLog(req.query.roomNum).then((r) => {
+    console.log(r);
     res.send(r);
   });
 });
@@ -68,9 +70,9 @@ io.on("connection", function (ioSocket) {
 
   /*-----------------------------------*/
 
-  ioSocket.on("msgToServer", (roomNum, userName, msg) => {
-    io.to(roomNum).emit("msgToRoom", { userName, msg });
-    db.recordMessage(msg, userName, roomNum);
+  ioSocket.on("msgToServer", (roomNum, userName, msg, dateTime) => {
+    io.to(roomNum).emit("msgToRoom", { userName, msg, dateTime });
+    db.recordMessage(msg, userName, roomNum, dateTime);
   });
 
   /*-----------------------------------*/

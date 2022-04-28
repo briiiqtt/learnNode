@@ -18,6 +18,7 @@
   overflow-y: scroll;
 }
 .ggupdegi,
+#userlist,
 #roomlist {
   height: calc(100vh - 112px - 10vh);
   overflow-y: scroll;
@@ -93,6 +94,20 @@ i {
 }
 .li-datetime {
   font: 1em;
+}
+.my-name {
+  font-size: 2.5em;
+}
+.my-profilemessage {
+  font-size: 1.2em;
+}
+.myprofile{
+  height: 15vh;
+}
+.my-peusa {
+  width: 25vw;
+  height: 25vh;
+  border: 1px solid gray;
 }
 .footbox i{
   font-size: 7vw;

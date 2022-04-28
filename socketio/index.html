@@ -22,19 +22,27 @@
                 <i class="margin10 bi bi-gear"></i>
             </div>
         </div>
-        <div id="display-login" style="display: block;" class="dp">
-            <input id="userName" placeholder="이름">
-            <div class="confirmusername btn btn-success">제출</div>
-        </div>
         <div id="display-userlist" style="display: none;" class="dp">
-            <div class="ggupdegi"></div>
+            <div id="userlist">
+                <ul id="usersul" class="list-group list-group">
+                    <li class="myprofile list-group-item">
+                        <div class="row">
+                            <div class="col-2 li-left">
+                                <img src="./public/img/dummy.png" class="img-fluid rounded-circle my-peusa">
+                            </div>
+                            <div class="col-8" li-mid>
+                                <div class="my-name">userName</div>
+                                <div class="my-profilemessage">profile message</div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
         </div>
         <div id="display-roomlist" style="display: none;" class="dp">
             <div id="roomlist">
-                <ul id="roomsul" class="list-group list-group">
-                </ul>
-                <div class="rooms" id="rooms">
-                </div>
+                <ul id="roomsul" class="list-group list-group"></ul>
+                <!-- <div class="rooms" id="rooms"></div> -->
             </div>
         </div>
         <div id="display-chat" style="display: none;" class="dp">
@@ -55,8 +63,11 @@
                 </div>
             </div>
         </div>
-        <div id="display-settings" style="display: none;" class="dp">
-            <div class="ggupdegi"></div>
+        <div id="display-settings" style="display: block;" class="dp">
+            <div class="ggupdegi">
+                <input id="userName" placeholder="이름">
+                <div class="confirmusername btn btn-success">제출</div>
+            </div>
         </div>
         <div id="display-footer" style="display: block;" class="container-fluid cf2 dp">
             <div class="row">

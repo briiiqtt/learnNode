@@ -74,6 +74,9 @@ io.on("connection", function (ioSocket) {
     io.to(roomNum).emit("msgToRoom", { userName, msg, dateTime });
     db.recordMessage(msg, userName, roomNum, dateTime);
   });
+  ioSocket.on("asdf", (asdf) => {
+    console.log(asdf);
+  });
 
   /*-----------------------------------*/
 

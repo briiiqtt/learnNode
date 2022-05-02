@@ -217,8 +217,14 @@ socket.on("roomCreated", function (obj) {
 
 let chat = document.getElementById("chat");
 chat.addEventListener("keydown", (e) => {
-  if (e.keyCode !== 13) return false;
+  if (e.key !== "Enter") return false;
   document.getElementById("send").click();
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "\\") {
+    socket.emit('asdf','asdf');
+  }
 });
 
 const getDateTimeString = function () {
